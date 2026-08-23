@@ -19,6 +19,11 @@ body {
   font-family: var(--font-rajdhani), sans-serif;
 }
 
+/* Background stars image used on the main layout */
+.bg-stars {
+  background-image: url('/bg-stars.png');
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${rajdhani.variable} font-sans antialiased bg-[#0B1120] text-white min-h-screen bg-[url(/bg-stars.png)] bg-cover bg-fixed`}
+        className={`${rajdhani.variable} font-sans antialiased bg-[#0B1120] text-white min-h-screen bg-cover bg-fixed bg-stars`}
       >
         <div className="fixed inset-0 bg-gradient-to-br from-blue-950/80 via-slate-900/90 to-black/90 -z-10" />
         <Navbar />
