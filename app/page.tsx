@@ -78,7 +78,7 @@ export default function Home() {
           {/* High Res Image */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img 
-            src="igris.jpg" 
+            src="/igris.jpg" 
             alt="Igris" 
             className="w-full h-full object-cover object-[center_20%] opacity-90 transition-transform duration-700 group-hover:scale-105"
           />
