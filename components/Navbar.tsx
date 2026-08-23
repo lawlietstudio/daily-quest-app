@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
+  const pathname = usePathname() || "/";
   return (
     <nav className="glass-panel border-b-0 border-b-cyan-500/20 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -54,6 +58,36 @@ export default function Navbar() {
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               <span className="text-xs text-slate-300 uppercase tracking-wider">System Online</span>
             </div>
+          </div>
+        </div>
+      </div>
+      {/* Mobile bottom tab bar */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-slate-900/70 backdrop-blur z-50 border-t border-slate-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14">
+            {[{
+              href: '/',
+              label: 'Daily'
+            },{
+              href: '/quests',
+              label: 'Quests'
+            },{
+              href: '/monthly',
+              label: 'Monthly'
+            },{
+              href: '/mottos',
+              label: 'Mottos'
+            },{
+              href: '/eisenhower-matrix',
+              label: 'Matrix'
+            }].map((item) => {
+              const active = pathname === item.href || pathname.startsWith(item.href + '/');
+              return (
+                <Link key={item.href} href={item.href} className={`flex-1 text-center py-3 text-xs ${active ? 'text-cyan-300 font-semibold' : 'text-slate-300'} `}>
+                  {item.label}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>
