@@ -83,8 +83,15 @@ export const subscribeToQuests = (
 export const createQuest = async (
   quest: Omit<DailyQuest, "firestoreId">
 ): Promise<string> => {
-  const docRef = await addDoc(collection(db, COLLECTION_NAME), quest);
-  return docRef.id;
+  try {
+    console.log('createQuest: adding', quest);
+    const docRef = await addDoc(collection(db, COLLECTION_NAME), quest);
+    console.log('createQuest: success', docRef.id);
+    return docRef.id;
+  } catch (e) {
+    console.error('createQuest: error', e);
+    throw e;
+  }
 };
 
 // Update a quest
@@ -92,14 +99,28 @@ export const updateQuest = async (
   firestoreId: string,
   quest: Partial<DailyQuest>
 ): Promise<void> => {
-  const questRef = doc(db, COLLECTION_NAME, firestoreId);
-  await updateDoc(questRef, quest);
+  try {
+    console.log('updateQuest:', firestoreId, quest);
+    const questRef = doc(db, COLLECTION_NAME, firestoreId);
+    await updateDoc(questRef, quest);
+    console.log('updateQuest: success', firestoreId);
+  } catch (e) {
+    console.error('updateQuest: error', e);
+    throw e;
+  }
 };
 
 // Delete a quest
 export const deleteQuest = async (firestoreId: string): Promise<void> => {
-  const questRef = doc(db, COLLECTION_NAME, firestoreId);
-  await deleteDoc(questRef);
+  try {
+    console.log('deleteQuest:', firestoreId);
+    const questRef = doc(db, COLLECTION_NAME, firestoreId);
+    await deleteDoc(questRef);
+    console.log('deleteQuest: success', firestoreId);
+  } catch (e) {
+    console.error('deleteQuest: error', e);
+    throw e;
+  }
 };
 
 // Get the next available ID
@@ -207,8 +228,15 @@ export const updateProgress = async (
 ): Promise<void> => {
   if (existingProgress && existingProgress.firestoreId) {
     // Update existing
-    const progressRef = doc(db, PROGRESS_COLLECTION_NAME, existingProgress.firestoreId);
-    await updateDoc(progressRef, { quantity });
+    try {
+      console.log('updateProgress: updating', existingProgress.firestoreId, quantity);
+      const progressRef = doc(db, PROGRESS_COLLECTION_NAME, existingProgress.firestoreId);
+      await updateDoc(progressRef, { quantity });
+      console.log('updateProgress: success', existingProgress.firestoreId);
+    } catch (e) {
+      console.error('updateProgress: error', e);
+      throw e;
+    }
   } else {
     // Create new
     const nextId = await getNextProgressId();
@@ -218,7 +246,14 @@ export const updateProgress = async (
       date,
       quantity,
     };
-    await addDoc(collection(db, PROGRESS_COLLECTION_NAME), newProgress);
+    try {
+      console.log('updateProgress: creating', newProgress);
+      const docRef = await addDoc(collection(db, PROGRESS_COLLECTION_NAME), newProgress);
+      console.log('updateProgress: created', docRef.id);
+    } catch (e) {
+      console.error('updateProgress: error creating', e);
+      throw e;
+    }
   }
 };
 
