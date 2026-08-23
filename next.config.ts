@@ -5,8 +5,9 @@ const nextConfig: NextConfig = {
   output: "export",
   // If you host under a path like https://username.github.io/repo-name,
   // set `basePath` and `assetPrefix` to `/repo-name`.
-  // basePath: '/REPO_NAME',
-  // assetPrefix: '/REPO_NAME/',
+  // Serving from GitHub Pages under a repo path
+  basePath: "/daily-quest-app",
+  assetPrefix: "/daily-quest-app/",
 };
 
 export default nextConfig;
