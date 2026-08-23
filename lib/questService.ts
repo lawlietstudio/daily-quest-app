@@ -17,9 +17,27 @@ import { DailyQuest, DailyProgress } from "@/types/quest";
 const COLLECTION_NAME = "quests";
 const PROGRESS_COLLECTION_NAME = "progress";
 
+// Simple in-memory tracker to avoid calling console.time with the same label twice
+const __timers = new Set<string>();
+function startTimerOnce(label: string) {
+  if (__timers.has(label)) {
+    console.warn(`Timer '${label}' already exists`);
+    return false;
+  }
+  __timers.add(label);
+  console.time(label);
+  return true;
+}
+function endTimerIfExists(label: string) {
+  if (!__timers.has(label)) return false;
+  console.timeEnd(label);
+  __timers.delete(label);
+  return true;
+}
+
 // Get all quests
 export const getAllQuests = async (): Promise<DailyQuest[]> => {
-  console.time("getAllQuests");
+  startTimerOnce("getAllQuests");
   const q = query(collection(db, COLLECTION_NAME), orderBy("id", "asc"));
   const querySnapshot = await getDocs(q);
   const quests = querySnapshot.docs.map((doc) => ({
@@ -37,11 +55,13 @@ export const subscribeToQuests = (
   callback: (quests: DailyQuest[]) => void
 ): Unsubscribe => {
   const q = query(collection(db, COLLECTION_NAME), orderBy("id", "asc"));
-  console.time("subscribeToQuests.firstSnapshot");
+  const timerLabel = `subscribeToQuests.firstSnapshot:${Date.now()}`;
+  startTimerOnce(timerLabel);
   let first = true;
-  return onSnapshot(q, (querySnapshot) => {
+  console.log("subscribeToQuests: subscribing");
+  const unsub = onSnapshot(q, (querySnapshot) => {
     if (first) {
-      console.timeEnd("subscribeToQuests.firstSnapshot");
+      endTimerIfExists(timerLabel);
       first = false;
     }
     const quests = querySnapshot.docs.map((doc) => ({
@@ -53,6 +73,10 @@ export const subscribeToQuests = (
     const sortedQuests = quests.sort((a, b) => (a.priority ?? 999) - (b.priority ?? 999) || a.id - b.id);
     callback(sortedQuests);
   });
+  return () => {
+    console.log("subscribeToQuests: unsubscribing");
+    unsub();
+  };
 };
 
 // Create a new quest
@@ -97,11 +121,13 @@ export const subscribeToProgress = (
     collection(db, PROGRESS_COLLECTION_NAME),
     where("date", "==", date)
   );
-  console.time("subscribeToProgress.firstSnapshot");
+  const timerLabel = `subscribeToProgress.firstSnapshot:${date}:${Date.now()}`;
+  startTimerOnce(timerLabel);
   let first = true;
-  return onSnapshot(q, (querySnapshot) => {
+  console.log(`subscribeToProgress: subscribing for ${date}`);
+  const unsub = onSnapshot(q, (querySnapshot) => {
     if (first) {
-      console.timeEnd("subscribeToProgress.firstSnapshot");
+      endTimerIfExists(timerLabel);
       first = false;
     }
     const progress = querySnapshot.docs.map((doc) => ({
@@ -110,6 +136,10 @@ export const subscribeToProgress = (
     })) as DailyProgress[];
     callback(progress);
   });
+  return () => {
+    console.log(`subscribeToProgress: unsubscribing for ${date}`);
+    unsub();
+  };
 };
 
 // Subscribe to progress for a date range
@@ -123,11 +153,13 @@ export const subscribeToMonthlyProgress = (
     where("date", ">=", startDate),
     where("date", "<=", endDate)
   );
-  console.time("subscribeToMonthlyProgress.firstSnapshot");
+  const timerLabel = `subscribeToMonthlyProgress.firstSnapshot:${startDate}:${endDate}:${Date.now()}`;
+  startTimerOnce(timerLabel);
   let first = true;
-  return onSnapshot(q, (querySnapshot) => {
+  console.log(`subscribeToMonthlyProgress: subscribing ${startDate} -> ${endDate}`);
+  const unsub = onSnapshot(q, (querySnapshot) => {
     if (first) {
-      console.timeEnd("subscribeToMonthlyProgress.firstSnapshot");
+      endTimerIfExists(timerLabel);
       first = false;
     }
     const progress = querySnapshot.docs.map((doc) => ({
@@ -136,17 +168,22 @@ export const subscribeToMonthlyProgress = (
     })) as DailyProgress[];
     callback(progress);
   });
+  return () => {
+    console.log(`subscribeToMonthlyProgress: unsubscribing ${startDate} -> ${endDate}`);
+    unsub();
+  };
 };
 
 // Get all progress (helper for ID generation)
 const getAllProgress = async (): Promise<DailyProgress[]> => {
-  console.time("getAllProgress");
+  const label = `getAllProgress:${Date.now()}`;
+  startTimerOnce(label);
   const querySnapshot = await getDocs(collection(db, PROGRESS_COLLECTION_NAME));
   const res = querySnapshot.docs.map((doc) => ({
     ...doc.data(),
     firestoreId: doc.id,
   })) as DailyProgress[];
-  console.timeEnd("getAllProgress");
+  endTimerIfExists(label);
   return res;
 };
 
