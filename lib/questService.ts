@@ -19,6 +19,7 @@ const PROGRESS_COLLECTION_NAME = "progress";
 
 // Get all quests
 export const getAllQuests = async (): Promise<DailyQuest[]> => {
+  console.time("getAllQuests");
   const q = query(collection(db, COLLECTION_NAME), orderBy("id", "asc"));
   const querySnapshot = await getDocs(q);
   const quests = querySnapshot.docs.map((doc) => ({
@@ -36,7 +37,13 @@ export const subscribeToQuests = (
   callback: (quests: DailyQuest[]) => void
 ): Unsubscribe => {
   const q = query(collection(db, COLLECTION_NAME), orderBy("id", "asc"));
+  console.time("subscribeToQuests.firstSnapshot");
+  let first = true;
   return onSnapshot(q, (querySnapshot) => {
+    if (first) {
+      console.timeEnd("subscribeToQuests.firstSnapshot");
+      first = false;
+    }
     const quests = querySnapshot.docs.map((doc) => ({
       ...doc.data(),
       firestoreId: doc.id,
@@ -90,7 +97,13 @@ export const subscribeToProgress = (
     collection(db, PROGRESS_COLLECTION_NAME),
     where("date", "==", date)
   );
+  console.time("subscribeToProgress.firstSnapshot");
+  let first = true;
   return onSnapshot(q, (querySnapshot) => {
+    if (first) {
+      console.timeEnd("subscribeToProgress.firstSnapshot");
+      first = false;
+    }
     const progress = querySnapshot.docs.map((doc) => ({
       ...doc.data(),
       firestoreId: doc.id,
@@ -110,7 +123,13 @@ export const subscribeToMonthlyProgress = (
     where("date", ">=", startDate),
     where("date", "<=", endDate)
   );
+  console.time("subscribeToMonthlyProgress.firstSnapshot");
+  let first = true;
   return onSnapshot(q, (querySnapshot) => {
+    if (first) {
+      console.timeEnd("subscribeToMonthlyProgress.firstSnapshot");
+      first = false;
+    }
     const progress = querySnapshot.docs.map((doc) => ({
       ...doc.data(),
       firestoreId: doc.id,
@@ -121,11 +140,14 @@ export const subscribeToMonthlyProgress = (
 
 // Get all progress (helper for ID generation)
 const getAllProgress = async (): Promise<DailyProgress[]> => {
+  console.time("getAllProgress");
   const querySnapshot = await getDocs(collection(db, PROGRESS_COLLECTION_NAME));
-  return querySnapshot.docs.map((doc) => ({
+  const res = querySnapshot.docs.map((doc) => ({
     ...doc.data(),
     firestoreId: doc.id,
   })) as DailyProgress[];
+  console.timeEnd("getAllProgress");
+  return res;
 };
 
 // Get next progress ID
