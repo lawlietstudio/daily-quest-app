@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 export default function Navbar() {
   const pathname = usePathname() || "/";
+  const [showMobileTabs, setShowMobileTabs] = useState(false);
   return (
     <nav className="glass-panel border-b-0 border-b-cyan-500/20 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -58,39 +60,56 @@ export default function Navbar() {
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               <span className="text-xs text-slate-300 uppercase tracking-wider">System Online</span>
             </div>
+            {/* Mobile toggler */}
+            <button
+              aria-label="Toggle navigation"
+              aria-expanded={showMobileTabs}
+              onClick={() => setShowMobileTabs((s) => !s)}
+              className="sm:hidden inline-flex items-center justify-center p-2 rounded-md text-slate-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {showMobileTabs ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </div>
         </div>
       </div>
-      {/* Mobile bottom tab bar */}
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-slate-900/70 backdrop-blur z-50 border-t border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-14">
-            {[{
-              href: '/',
-              label: 'Daily'
-            },{
-              href: '/quests',
-              label: 'Quests'
-            },{
-              href: '/monthly',
-              label: 'Monthly'
-            },{
-              href: '/mottos',
-              label: 'Mottos'
-            },{
-              href: '/eisenhower-matrix',
-              label: 'Matrix'
-            }].map((item) => {
-              const active = pathname === item.href || pathname.startsWith(item.href + '/');
-              return (
-                <Link key={item.href} href={item.href} className={`flex-1 text-center py-3 text-xs ${active ? 'text-cyan-300 font-semibold' : 'text-slate-300'} `}>
-                  {item.label}
-                </Link>
-              );
-            })}
+      {/* Mobile bottom tab bar (toggleable) */}
+      {showMobileTabs && (
+        <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur z-50 border-t border-slate-700">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-14">
+              {[{
+                href: '/',
+                label: 'Daily'
+              },{
+                href: '/quests',
+                label: 'Quests'
+              },{
+                href: '/monthly',
+                label: 'Monthly'
+              },{
+                href: '/mottos',
+                label: 'Mottos'
+              },{
+                href: '/eisenhower-matrix',
+                label: 'Matrix'
+              }].map((item) => {
+                const active = pathname === item.href || pathname.startsWith(item.href + '/');
+                return (
+                  <Link key={item.href} href={item.href} onClick={() => setShowMobileTabs(false)} className={`flex-1 text-center py-3 text-xs ${active ? 'text-cyan-300 font-semibold' : 'text-slate-300'} `}>
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 }
