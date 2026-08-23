@@ -13,6 +13,9 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// Diagnostic: expose which build-time Firebase values were embedded
+console.log('firebase.config:', { projectId: firebaseConfig.projectId, apiKey: firebaseConfig.apiKey });
+
 // Initialize Firebase
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getFirestore(app);
