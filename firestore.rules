@@ -8,9 +8,10 @@ service cloud.firestore {
       // OPTION 1: Open to everyone (simplest for prototyping)
       // allow read, write: if true;
 
-      // OPTION 2: Open until a specific date (what you likely had before)
-      // extended to 30 days from now
-      allow read, write: if request.time < timestamp.date(2026, 2, 20);
+      // OPTION 2: Open until a specific date (was set previously and expired)
+      // Extended to a later date for continued testing. Replace with
+      // proper auth-based rules for production.
+      allow read, write: if request.time < timestamp.date(2030, 1, 01);
     }
   }
 }
