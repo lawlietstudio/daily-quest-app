@@ -21,7 +21,7 @@ body {
 
 /* Background stars image used on the main layout */
 .bg-stars {
-  background-image: url('/igris.jpg');
+  background-image: url('igris.jpg');
 }
 
 /* Custom Scrollbar */
